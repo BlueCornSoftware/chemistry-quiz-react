@@ -128,7 +128,7 @@ class App extends React.Component<any, any> {
   }
 
   public render() {
-    const [correctAnswer] = sampleData;
+    const correctAnswer = sampleData[0];
     const { score, skippedQuestions } = this.state;
     return (
       <div className="app">
@@ -139,13 +139,9 @@ class App extends React.Component<any, any> {
           correctAnswer={correctAnswer}
           afterGuess={h => {
             if (!h.isCorrect) {
-              this.setState({
-                score: this.state.score - 10,
-              });
+              this.changeScore(-10)
             } else {
-              this.setState({
-                score: this.state.score + 10,
-              });
+              this.changeScore(10)
             }
           }}
         />
@@ -156,6 +152,12 @@ class App extends React.Component<any, any> {
         }}/>
       </div>
     );
+  }
+
+  private changeScore(amount: number): void {
+    this.setState({
+      score: this.state.score + amount,
+    })
   }
 }
 
