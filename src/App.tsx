@@ -35,9 +35,15 @@ class QuestionText extends React.Component<IQuestionTextProps> {
 
 type AtomicElement = any;
 
+interface IGuessHookState {
+  guess: AtomicElement;
+  isCorrect: boolean;
+}
+
 interface IChoicesProps {
   data: AtomicElement[];
   correctAnswer: AtomicElement;
+  afterGuess: (h: IGuessHookState) => void;
 }
 
 interface IChoicesState {
@@ -76,10 +82,15 @@ class Choices extends React.Component<IChoicesProps, IChoicesState> {
   private handleGuess(element: AtomicElement): void {
     const { correctAnswer } = this.props;
     if (element.name === correctAnswer.name) {
-      // this.handleCorrectGuess();
+      this.handleCorrectGuess(element);
     } else {
       this.handleIncorrectGuess(element);
     }
+  }
+
+  private handleCorrectGuess(element: AtomicElement) {
+    const { afterGuess } = this.props;
+    afterGuess({ isCorrect: true, guess: element });
   }
 
   private handleIncorrectGuess(element: AtomicElement) {
@@ -88,6 +99,7 @@ class Choices extends React.Component<IChoicesProps, IChoicesState> {
         (el: any) => el.name !== element.name
       ),
     });
+    this.props.afterGuess({ guess: element, isCorrect: false });
   }
 }
 
@@ -100,14 +112,36 @@ class SkipButton extends React.Component {
 // click wrong answer and have option disappear
 // and, score drop by 10
 
-class App extends React.Component {
+class App extends React.Component<any, any> {
+  constructor(props: any) {
+    super(props);
+    this.state = {
+      score: 0,
+    };
+  }
+
   public render() {
     const [correctAnswer] = sampleData;
+    const { score } = this.state;
     return (
       <div className="app">
-        <Header score={0} skippedQuestions={0} />
+        <Header score={score} skippedQuestions={0} />
         <QuestionText atomicSymbol={correctAnswer.symbol} />
-        <Choices data={sampleData} correctAnswer={correctAnswer} />
+        <Choices
+          data={sampleData}
+          correctAnswer={correctAnswer}
+          afterGuess={h => {
+            if (!h.isCorrect) {
+              this.setState({
+                score: this.state.score - 10,
+              });
+            } else {
+              this.setState({
+                score: this.state.score + 10,
+              });
+            }
+          }}
+        />
         <SkipButton />
       </div>
     );
