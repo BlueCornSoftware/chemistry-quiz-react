@@ -80,11 +80,11 @@ class Choices extends React.Component<IChoicesProps, IChoicesState> {
   }
 
   private handleGuess(element: AtomicElement): void {
-    const { correctAnswer } = this.props;
+    const { correctAnswer } = this.props
     if (element.name === correctAnswer.name) {
-      this.handleCorrectGuess(element);
+      this.handleCorrectGuess(element)
     } else {
-      this.handleIncorrectGuess(element);
+      this.handleIncorrectGuess(element)
     }
   }
 
@@ -98,34 +98,41 @@ class Choices extends React.Component<IChoicesProps, IChoicesState> {
       elements: this.state.elements.filter(
         (el: any) => el.name !== element.name
       ),
+    }, () => {
+      this.props.afterGuess({ guess: element, isCorrect: false });
     });
-    this.props.afterGuess({ guess: element, isCorrect: false });
   }
 }
 
-class SkipButton extends React.Component {
+interface ISkipButtonProps {
+  afterSkipClicked: () => void
+}
+
+class SkipButton extends React.Component<ISkipButtonProps> {
   public render() {
-    return <button>Skip</button>;
+    return (
+      <button onClick={this.props.afterSkipClicked}>
+        Skip
+      </button>
+    )
   }
 }
-
-// click wrong answer and have option disappear
-// and, score drop by 10
 
 class App extends React.Component<any, any> {
   constructor(props: any) {
     super(props);
     this.state = {
       score: 0,
+      skippedQuestions: 0,
     };
   }
 
   public render() {
     const [correctAnswer] = sampleData;
-    const { score } = this.state;
+    const { score, skippedQuestions } = this.state;
     return (
       <div className="app">
-        <Header score={score} skippedQuestions={0} />
+        <Header score={score} skippedQuestions={skippedQuestions} />
         <QuestionText atomicSymbol={correctAnswer.symbol} />
         <Choices
           data={sampleData}
@@ -142,7 +149,11 @@ class App extends React.Component<any, any> {
             }
           }}
         />
-        <SkipButton />
+        <SkipButton afterSkipClicked={() => {
+          this.setState({
+            skippedQuestions: this.state.skippedQuestions + 1
+          })
+        }}/>
       </div>
     );
   }
