@@ -36,23 +36,23 @@ class QuestionText extends React.Component<IQuestionTextProps> {
 type AtomicElement = any;
 
 interface IGuessHookState {
-  guess: AtomicElement;
-  isCorrect: boolean;
+  guess: AtomicElement
+  isCorrect: boolean
 }
 
 interface IChoicesProps {
-  data: AtomicElement[];
-  correctAnswer: AtomicElement;
-  afterGuess: (h: IGuessHookState) => void;
+  data: AtomicElement[]
+  correctAnswer: AtomicElement
+  afterGuess: (h: IGuessHookState) => void
 }
 
 interface IChoicesState {
-  elements: AtomicElement[];
+  elements: AtomicElement[]
 }
 
 class Choices extends React.Component<IChoicesProps, IChoicesState> {
   constructor(props: IChoicesProps) {
-    super(props);
+    super(props)
     this.state = {
       elements: props.data,
     };
@@ -64,15 +64,13 @@ class Choices extends React.Component<IChoicesProps, IChoicesState> {
       <div>
         {elements.map((element: any) => {
           return (
-            <>
+            <div key={element.number}>
               <button
-                key={element.number}
                 onClick={() => this.handleGuess(element)}
               >
                 {element.name}
               </button>
-              <br />
-            </>
+            </div>
           );
         })}
       </div>
@@ -89,18 +87,18 @@ class Choices extends React.Component<IChoicesProps, IChoicesState> {
   }
 
   private handleCorrectGuess(element: AtomicElement) {
-    const { afterGuess } = this.props;
-    afterGuess({ isCorrect: true, guess: element });
+    const { afterGuess } = this.props
+    afterGuess({ isCorrect: true, guess: element })
   }
 
   private handleIncorrectGuess(element: AtomicElement) {
+    const { afterGuess } = this.props
+    const { elements } = this.state
     this.setState({
-      elements: this.state.elements.filter(
-        (el: any) => el.name !== element.name
-      ),
+      elements: elements.filter(({ name }) => name !== element.name),
     }, () => {
-      this.props.afterGuess({ guess: element, isCorrect: false });
-    });
+      afterGuess({ guess: element, isCorrect: false });
+    })
   }
 }
 
@@ -151,7 +149,7 @@ class App extends React.Component<any, any> {
           })
         }}/>
       </div>
-    );
+    )
   }
 
   private changeScore(amount: number): void {
